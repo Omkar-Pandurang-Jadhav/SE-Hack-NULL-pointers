@@ -29,7 +29,7 @@ export function LoginPage() {
     try {
       if (isLogin) {
         await login(email, password);
-        toast.success('Welcome Back Students!');
+        toast.success('Welcome Back!');
       } else {
         await register(email, password, name, role);
         toast.success('Account created successfully!');
