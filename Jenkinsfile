@@ -24,7 +24,7 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                           -Dsonar.projectKey=campus-quiz \
                           -Dsonar.sources=. \
-                          -Dsonar.host.url=http://3.110.96.117/:9000 \
+                          -Dsonar.host.url=http://3.110.96.117:9000 \
                           -Dsonar.login=$SONAR_AUTH_TOKEN
                         """
                     }
