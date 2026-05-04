@@ -5,7 +5,7 @@
 
 const config = {
   // API Configuration
-  API_URL: import.meta.env.VITE_API_URL || 'http://localhost:30007/api',
+  API_URL: import.meta.env.VITE_API_URL || 'http://3.110.96.117:30007/api',
 
   // App Configuration
   APP_NAME: 'Campus LMS',

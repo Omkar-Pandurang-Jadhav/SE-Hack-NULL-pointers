@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const API_URL = 'http://localhost:30007/api';
+const API_URL = 'http://3.110.96.117:30007/api';
 
 interface User {
   id: string;
