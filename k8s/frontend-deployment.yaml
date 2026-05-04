@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 1
+  replicas: 2   # 👈 base replicas (important for load balancing)
   selector:
     matchLabels:
       app: frontend
@@ -14,7 +14,16 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: scoute/frontend   # 👈 no tag here
+          image: scoute/frontend
           imagePullPolicy: Always
           ports:
             - containerPort: 80
+
+          # 🔥 IMPORTANT PART (for HPA)
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

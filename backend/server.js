@@ -6,65 +6,74 @@ import { Server } from 'socket.io';
 import connectDB from './config/db.js';
 import { setupQuizSocket } from './socket/quizSocket.js';
 
-// Import routes
+// Routes
 import authRoutes from './routes/authRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
 import seedRoutes from './routes/seedRoutes.js';
 
-// Load environment variables
 dotenv.config();
 
-// Initialize Express app
 const app = express();
 const httpServer = createServer(app);
 
-// Initialize Socket.io
+// ✅ Parse multiple origins from .env
+const allowedOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map(origin => origin.trim());
+
+console.log("Allowed Origins:", allowedOrigins);
+
+// ✅ Socket.io CORS
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-// Connect to MongoDB
+// Connect DB
 connectDB();
 
-// Middleware
+// ✅ Express CORS (IMPORTANT FIX)
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log("Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Basic route
+// Test route
 app.get('/', (req, res) => {
   res.json({
     message: 'Campus LMS API is running',
-    version: '1.0.0',
-    endpoints: {
-      auth: '/api/auth',
-      courses: '/api/courses',
-      quizzes: '/api/quizzes',
-      seed: '/api/seed'
-    }
+    version: '1.0.0'
   });
 });
 
-// API Routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/seed', seedRoutes);
 
-// Setup Socket.io for quiz battles
+// Socket setup
 setupQuizSocket(io);
-
-// Make io accessible to routes
 app.set('io', io);
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -74,12 +83,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
+
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`To seed database: POST http://localhost:${PORT}/api/seed`);
+  console.log(`Frontend allowed: ${allowedOrigins.join(', ')}`);
 });
-
-export { io };
-

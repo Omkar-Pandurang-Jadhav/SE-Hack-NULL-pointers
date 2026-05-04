@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: backend
 spec:
-  replicas: 1
+  replicas: 2   # 👈 helps with load balancing
   selector:
     matchLabels:
       app: backend
@@ -14,10 +14,20 @@ spec:
     spec:
       containers:
         - name: backend
-          image: scoute/backend   # 👈 no tag here
+          image: scoute/backend:latest   # 👈 better to specify tag
           imagePullPolicy: Always
           ports:
             - containerPort: 5001
+
           envFrom:
             - secretRef:
                 name: backend-secret
+
+          # 🔥 IMPORTANT (for HPA + monitoring)
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

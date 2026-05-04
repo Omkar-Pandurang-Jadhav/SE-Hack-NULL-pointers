@@ -23,7 +23,7 @@ COPY . .
 RUN rm -rf node_modules/.cache
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5001
 
 # Start app (production)
 CMD ["npm", "start"]
