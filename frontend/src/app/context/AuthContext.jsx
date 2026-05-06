@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const API_URL = 'http://3.110.96.117:30007/api';
+const API_URL = 'http://3.110.22.64:30007/api';
 
 /**
  * @typedef {Object} User
